@@ -8,4 +8,4 @@
   - Highly Recommended to use IntelliJ IDEA as the IDE
 
 Info:
-- Port is running on http://localhost:3000
+- Server is running on port http://localhost:3000
