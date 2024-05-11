@@ -21,6 +21,12 @@ public class ProductController {
         return ResponseEntity.ok(productsData);
     }
 
+    @GetMapping("/api/v1/product/get_product/{productId}")
+    public ResponseEntity<ProductDto> getProductById(@PathVariable Long productId) {
+        ProductDto productData = productService.getProductById(productId);
+        return ResponseEntity.ok(productData);
+    }
+
     @PostMapping("/api/v1/product/add_product")
     public ResponseEntity<ProductDto> addProduct(@RequestBody ProductDto productDto) {
         ProductDto productData = productService.addProduct(productDto);

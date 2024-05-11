@@ -25,6 +25,7 @@ public class SecurityConfig {
 
         Set<String> getEndpoints = Set.of(
                 "/api/v1/product/get_products",
+                "/api/v1/product/get_product/{productId}",
                 "/api/v1"
         );
 
