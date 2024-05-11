@@ -3,8 +3,6 @@ package com.streamhealth.api.controllers;
 import com.streamhealth.api.dtos.ProductDto;
 import com.streamhealth.api.services.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +18,6 @@ public class ProductController {
     @GetMapping("/product/get_products")
     public ResponseEntity<List<ProductDto>> getProducts(@RequestParam(required = false) String query) {
         List<ProductDto> productsData;
-
         if(query != null) {
             productsData = productService.searchProductsByName(query);
         } else {
