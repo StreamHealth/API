@@ -4,9 +4,7 @@ import com.streamhealth.api.dtos.ProductDto;
 import com.streamhealth.api.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,5 +19,17 @@ public class ProductController {
     public ResponseEntity<List<ProductDto>> getProducts() {
         List<ProductDto>productsData = productService.getAllProducts();
         return ResponseEntity.ok(productsData);
+    }
+
+    @PostMapping("/api/v1/product/add_product")
+    public ResponseEntity<ProductDto> addProduct(@RequestBody ProductDto productDto) {
+        ProductDto productData = productService.addProduct(productDto);
+        return ResponseEntity.ok(productData);
+    }
+
+    @DeleteMapping("/api/v1/product/delete_product/{productId}")
+    public ResponseEntity<String> deleteProduct(@PathVariable Long productId) {
+        productService.deleteProduct(productId);
+        return ResponseEntity.ok("Product deleted successfully: " + productId);
     }
 }

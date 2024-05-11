@@ -11,6 +11,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import java.util.Set;
+
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
@@ -21,15 +23,39 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
+        Set<String> getEndpoints = Set.of(
+                "/api/v1/product/get_products",
+                "/api/v1"
+        );
+
+        Set<String> postEndpoints = Set.of(
+                "/api/v1/product/add_product",
+                "/api/v1/auth/register",
+                "/api/v1/auth/login"
+        );
+
+        Set<String> deleteEndpoints = Set.of(
+                "/api/v1/product/delete_product/{productId}"
+        );
+
         http.csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(new JWTAuthFilter(userAuthProvider), BasicAuthenticationFilter.class)
                 .sessionManagement(customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests((requests) ->
-                        requests
-                                .requestMatchers(HttpMethod.GET, "/api/v1", "/api/v1/product/get_products").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/v1/auth/login", "/api/v1/auth/register").permitAll()
-                                .anyRequest().authenticated()
-                );
+                .authorizeHttpRequests((requests) -> {
+                    for (String endpoint : getEndpoints) {
+                        requests.requestMatchers(HttpMethod.GET, endpoint).permitAll();
+                    }
+
+                    for (String endpoint : postEndpoints) {
+                        requests.requestMatchers(HttpMethod.POST, endpoint).permitAll();
+                    }
+
+                    for (String endpoint : deleteEndpoints) {
+                        requests.requestMatchers(HttpMethod.DELETE, endpoint).permitAll();
+                    }
+
+                    requests.anyRequest().authenticated();
+                });
         return http.build();
     }
 }
