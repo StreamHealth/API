@@ -30,19 +30,13 @@ public class ProductController {
 
     @PostMapping("/api/v1/product/add_product")
     public ResponseEntity<?> addProduct(@RequestBody ProductDto productDto) {
-        if (productDto.getProductName() == null || productDto.getProductDescription() == null ||
-                productDto.getProductPrice() == null || productDto.getProductStock() == null) {
-            return new ResponseEntity<>("Product details are incomplete", HttpStatus.BAD_REQUEST);
-        }
+        productService.validateProductDto(productDto);
         ProductDto productData = productService.addProduct(productDto);
         return ResponseEntity.ok(productData);
     }
     @PutMapping("/api/v1/product/update_product/{productId}")
     public ResponseEntity<?> updateProduct(@PathVariable Long productId, @RequestBody ProductDto productDto) {
-        if (productDto.getProductName() == null || productDto.getProductDescription() == null ||
-                productDto.getProductPrice() == null || productDto.getProductStock() == null) {
-            return new ResponseEntity<>("Product details are incomplete", HttpStatus.BAD_REQUEST);
-        }
+        productService.validateProductDto(productDto);
         ProductDto productData = productService.updateProduct(productId, productDto);
         return ResponseEntity.ok(productData);
     }

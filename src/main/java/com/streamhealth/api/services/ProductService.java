@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -49,5 +50,26 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                         .orElseThrow(() -> new AppException("Product not found", HttpStatus.NOT_FOUND));
         productRepository.deleteById(product.getProductId());
+    }
+
+    public void validateProductDto(ProductDto productDto) {
+        List<String> missingFields = new ArrayList<>();
+
+        if (productDto.getProductName() == null) {
+            missingFields.add("productName");
+        }
+        if (productDto.getProductDescription() == null) {
+            missingFields.add("productDescription");
+        }
+        if (productDto.getProductPrice() == null) {
+            missingFields.add("productPrice");
+        }
+        if (productDto.getProductStock() == null) {
+            missingFields.add("productStock");
+        }
+
+        if (!missingFields.isEmpty()) {
+            throw new AppException("Product details are incomplete. Missing fields: " + String.join(", ", missingFields), HttpStatus.BAD_REQUEST);
+        }
     }
 }
