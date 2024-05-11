@@ -72,4 +72,9 @@ public class ProductService {
             throw new AppException("Product details are incomplete. Missing fields: " + String.join(", ", missingFields), HttpStatus.BAD_REQUEST);
         }
     }
+
+    public List<ProductDto> searchProductsByName(String productName) {
+        List<Product> products = productRepository.findByProductNameContaining(productName);
+        return productMapper.toProductDtos(products);
+    }
 }
