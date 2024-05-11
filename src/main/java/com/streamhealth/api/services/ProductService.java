@@ -24,16 +24,16 @@ public class ProductService {
         return productMapper.toProductDtos(productRepository.findAll());
     }
 
-    public ProductDto addProduct(ProductDto productDto) {
-        Product product = productMapper.toProduct(productDto);
-        Product savedProduct = productRepository.save(product);
-        return productMapper.toProductDto(savedProduct);
-    }
-
     public ProductDto getProductById(Long productId) {
         Product product = productRepository.findById(productId)
                         .orElseThrow(() -> new AppException("Product not found", HttpStatus.NOT_FOUND));
         return productMapper.toProductDto(product);
+    }
+
+    public ProductDto addProduct(ProductDto productDto) {
+        Product product = productMapper.toProduct(productDto);
+        Product savedProduct = productRepository.save(product);
+        return productMapper.toProductDto(savedProduct);
     }
 
     @Transactional

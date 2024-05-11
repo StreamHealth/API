@@ -3,6 +3,7 @@ package com.streamhealth.api.controllers;
 import com.streamhealth.api.dtos.ProductDto;
 import com.streamhealth.api.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,13 +29,20 @@ public class ProductController {
     }
 
     @PostMapping("/api/v1/product/add_product")
-    public ResponseEntity<ProductDto> addProduct(@RequestBody ProductDto productDto) {
+    public ResponseEntity<?> addProduct(@RequestBody ProductDto productDto) {
+        if (productDto.getProductName() == null || productDto.getProductDescription() == null ||
+                productDto.getProductPrice() == null || productDto.getProductStock() == null) {
+            return new ResponseEntity<>("Product details are incomplete", HttpStatus.BAD_REQUEST);
+        }
         ProductDto productData = productService.addProduct(productDto);
         return ResponseEntity.ok(productData);
     }
     @PutMapping("/api/v1/product/update_product/{productId}")
-    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long productId, @RequestBody ProductDto productDto) {
-        System.out.println("Product: " + productDto);
+    public ResponseEntity<?> updateProduct(@PathVariable Long productId, @RequestBody ProductDto productDto) {
+        if (productDto.getProductName() == null || productDto.getProductDescription() == null ||
+                productDto.getProductPrice() == null || productDto.getProductStock() == null) {
+            return new ResponseEntity<>("Product details are incomplete", HttpStatus.BAD_REQUEST);
+        }
         ProductDto productData = productService.updateProduct(productId, productDto);
         return ResponseEntity.ok(productData);
     }
