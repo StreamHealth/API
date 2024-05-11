@@ -32,6 +32,12 @@ public class ProductController {
         ProductDto productData = productService.addProduct(productDto);
         return ResponseEntity.ok(productData);
     }
+    @PutMapping("/api/v1/product/update_product/{productId}")
+    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long productId, @RequestBody ProductDto productDto) {
+        System.out.println("Product: " + productDto);
+        ProductDto productData = productService.updateProduct(productId, productDto);
+        return ResponseEntity.ok(productData);
+    }
 
     @DeleteMapping("/api/v1/product/delete_product/{productId}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long productId) {

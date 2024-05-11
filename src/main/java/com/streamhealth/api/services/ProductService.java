@@ -5,6 +5,7 @@ import com.streamhealth.api.entities.Product;
 import com.streamhealth.api.exceptions.AppException;
 import com.streamhealth.api.mappers.ProductMapper;
 import com.streamhealth.api.repositories.ProductRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,15 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                         .orElseThrow(() -> new AppException("Product not found", HttpStatus.NOT_FOUND));
         return productMapper.toProductDto(product);
+    }
+
+    @Transactional
+    public ProductDto updateProduct(Long productId, ProductDto productDto) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new AppException("Product not found", HttpStatus.NOT_FOUND));
+        productMapper.updateProductFromDto(productDto, product);
+        Product updatedProduct = productRepository.save(product);
+        return productMapper.toProductDto(updatedProduct);
     }
 
     public void deleteProduct(Long productId) {

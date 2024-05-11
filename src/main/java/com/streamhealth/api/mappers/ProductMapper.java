@@ -3,6 +3,8 @@ package com.streamhealth.api.mappers;
 import com.streamhealth.api.dtos.ProductDto;
 import com.streamhealth.api.entities.Product;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -12,4 +14,10 @@ public interface ProductMapper {
     Product toProduct(ProductDto productDto);
     List<ProductDto> toProductDtos(List<Product> products);
 
+    @Mapping(target = "productName", source = "productDto.productName")
+    @Mapping(target = "productDescription", source = "productDto.productDescription")
+    @Mapping(target = "productPrice", source = "productDto.productPrice")
+    @Mapping(target = "productStock", source = "productDto.productStock")
+    @Mapping(target = "productId", ignore = true)
+    void updateProductFromDto(ProductDto productDto, @MappingTarget Product product);
 }

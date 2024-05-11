@@ -39,6 +39,10 @@ public class SecurityConfig {
                 "/api/v1/product/delete_product/{productId}"
         );
 
+        Set<String> putEndpoints = Set.of(
+                "/api/v1/product/update_product/{productId}"
+        );
+
         http.csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(new JWTAuthFilter(userAuthProvider), BasicAuthenticationFilter.class)
                 .sessionManagement(customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -53,6 +57,10 @@ public class SecurityConfig {
 
                     for (String endpoint : deleteEndpoints) {
                         requests.requestMatchers(HttpMethod.DELETE, endpoint).permitAll();
+                    }
+
+                    for (String endpoint : putEndpoints) {
+                        requests.requestMatchers(HttpMethod.PUT, endpoint).permitAll();
                     }
 
                     requests.anyRequest().authenticated();
