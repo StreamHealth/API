@@ -16,10 +16,10 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping("/get_products")
-    public ResponseEntity<List<ProductDto>> getProducts(@RequestParam(required = false) String query) {
+    public ResponseEntity<List<ProductDto>> getProducts(@RequestParam(required = false, value = "search") String search) {
         List<ProductDto> productsData;
-        if(query != null) {
-            productsData = productService.searchProductsByName(query);
+        if(search != null) {
+            productsData = productService.searchProductsByName(search);
         } else {
             productsData = productService.getAllProducts();
         }
