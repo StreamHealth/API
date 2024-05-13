@@ -5,6 +5,7 @@ import com.streamhealth.api.entities.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -20,4 +21,8 @@ public interface ProductMapper {
     @Mapping(target = "productStock", source = "productDto.productStock")
     @Mapping(target = "productId", ignore = true)
     void updateProductFromDto(ProductDto productDto, @MappingTarget Product product);
+
+    default Page<ProductDto> toProductDtos(Page<Product> products) {
+        return products.map(this::toProductDto);
+    }
 }

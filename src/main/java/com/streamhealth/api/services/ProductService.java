@@ -8,6 +8,8 @@ import com.streamhealth.api.repositories.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +23,21 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
-    public List<ProductDto> getAllProducts() {
-        return productMapper.toProductDtos(productRepository.findAll());
+//    public List<ProductDto> getAllProducts() {
+//        return productMapper.toProductDtos(productRepository.findAll());
+//    }
+//
+//    public List<ProductDto> searchProductsByName(String productName) {
+//        List<Product> products = productRepository.findByProductNameContaining(productName);
+//        return productMapper.toProductDtos(products);
+//    }
+
+    public Page<ProductDto> getAllProducts(Pageable pageable) {
+        return productMapper.toProductDtos(productRepository.findAll(pageable));
+    }
+
+    public Page<ProductDto> searchProductsByName(String productName, Pageable pageable) {
+        return productMapper.toProductDtos(productRepository.findByProductNameContaining(productName, pageable));
     }
 
     public ProductDto getProductById(Long productId) {
@@ -73,8 +88,5 @@ public class ProductService {
         }
     }
 
-    public List<ProductDto> searchProductsByName(String productName) {
-        List<Product> products = productRepository.findByProductNameContaining(productName);
-        return productMapper.toProductDtos(products);
-    }
+
 }

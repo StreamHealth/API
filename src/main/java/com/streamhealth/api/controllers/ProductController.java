@@ -3,6 +3,9 @@ package com.streamhealth.api.controllers;
 import com.streamhealth.api.dtos.ProductDto;
 import com.streamhealth.api.services.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,12 +19,13 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping("/get_products")
-    public ResponseEntity<List<ProductDto>> getProducts(@RequestParam(required = false, value = "search") String search) {
-        List<ProductDto> productsData;
+    public ResponseEntity<Page<ProductDto>> getProducts(@RequestParam(required = false, value = "search") String search,
+                                                        @PageableDefault(size = 5) Pageable pageable) {
+        Page<ProductDto> productsData;
         if(search != null) {
-            productsData = productService.searchProductsByName(search);
+            productsData = productService.searchProductsByName(search, pageable);
         } else {
-            productsData = productService.getAllProducts();
+            productsData = productService.getAllProducts(pageable);
         }
         return ResponseEntity.ok(productsData);
     }
