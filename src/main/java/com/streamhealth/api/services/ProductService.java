@@ -23,15 +23,6 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
-//    public List<ProductDto> getAllProducts() {
-//        return productMapper.toProductDtos(productRepository.findAll());
-//    }
-//
-//    public List<ProductDto> searchProductsByName(String productName) {
-//        List<Product> products = productRepository.findByProductNameContaining(productName);
-//        return productMapper.toProductDtos(products);
-//    }
-
     public Page<ProductDto> getAllProducts(Pageable pageable) {
         return productMapper.toProductDtos(productRepository.findAll(pageable));
     }
