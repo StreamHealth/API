@@ -28,7 +28,7 @@ public class SecurityConfig {
                 "/api/v1/transaction/get_transaction/{transactionId}",
                 "/api/v1/product/get_products",
                 "/api/v1/product/get_product/{productId}",
-                "/api/v1"
+                "/api/v1/user/get_user_and_sales"
         );
 
         Set<String> postEndpoints = Set.of(

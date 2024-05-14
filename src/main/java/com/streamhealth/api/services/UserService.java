@@ -4,9 +4,11 @@ import com.streamhealth.api.dtos.CredentialsDto;
 import com.streamhealth.api.dtos.SignUpDto;
 import com.streamhealth.api.dtos.UserDataDto;
 import com.streamhealth.api.dtos.UserDto;
+import com.streamhealth.api.entities.Transaction;
 import com.streamhealth.api.entities.User;
 import com.streamhealth.api.exceptions.AppException;
 import com.streamhealth.api.mappers.UserMapper;
+import com.streamhealth.api.repositories.TransactionRepository;
 import com.streamhealth.api.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +17,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.nio.CharBuffer;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,6 +29,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final TransactionRepository transactionRepository;
 
     public UserDto login(CredentialsDto credentialsDto) {
         User user = userRepository.findByLogin(credentialsDto.login())
@@ -63,6 +69,17 @@ public class UserService {
         UserDataDto userData = new UserDataDto();
         userData.setName(user.getName());
         userData.setLogin(user.getLogin());
+        userData.setId(user.getId());
         return userData;
     }
+
+    public BigDecimal getTotalSalesToday(User cashier) {
+        LocalDate today = LocalDate.now();
+        List<Transaction> transactions = transactionRepository.findAllByCashierAndTransactionDateBetween(
+                cashier, today.atStartOfDay(), today.plusDays(1).atStartOfDay());
+        return transactions.stream()
+                .map(Transaction::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
 }
