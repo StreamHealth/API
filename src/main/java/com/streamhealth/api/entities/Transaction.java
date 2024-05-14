@@ -34,4 +34,5 @@ public class Transaction {
 
     @OneToMany(mappedBy = "transaction",  cascade = CascadeType.REMOVE)
     private List<TransactionProduct> products = new ArrayList<>();
+
 }

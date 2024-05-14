@@ -31,13 +31,13 @@ public interface TransactionMapper {
     default Page<TransactionDto> toTransactionDtos(Page<Transaction> transactions) {
         return transactions.map(this::toTransactionDto);
     }
+
     @Mapping(target = "products", source = "transaction.products")
     TransactionDto toTransactionDto(Transaction transaction);
 
     @Mapping(target = "productId", source = "product.productId")
     @Mapping(target = "productName", source = "product.productName")
     TransactionDto.ProductSaleDto toProductSaleDto(TransactionProduct transactionProduct);
-
 }
 
 

@@ -5,6 +5,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.streamhealth.api.dtos.ProductDto;
 import com.streamhealth.api.dtos.TransactionDto;
+import com.streamhealth.api.entities.Transaction;
 import com.streamhealth.api.entities.User;
 import com.streamhealth.api.exceptions.AppException;
 import com.streamhealth.api.repositories.UserRepository;
