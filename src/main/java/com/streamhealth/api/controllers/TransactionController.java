@@ -49,7 +49,7 @@ public class TransactionController {
 
     @GetMapping("/get_transaction/{transactionId}")
     public ResponseEntity<TransactionDto> getTransaction(@PathVariable Long transactionId) {
-        TransactionDto transactionData = transactionService.getTransaction(transactionId);
+        TransactionDto transactionData = transactionService.getTransactionById(transactionId);
         return ResponseEntity.ok(transactionData);
     }
 

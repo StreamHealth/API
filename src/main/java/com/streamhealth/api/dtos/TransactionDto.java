@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 public class TransactionDto {
     private UserDto cashier;
-
+    private Long transactionId;
     private String clientName;
     private Date transactionDate;
     private BigDecimal totalAmount;

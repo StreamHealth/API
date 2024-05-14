@@ -118,8 +118,10 @@ public class TransactionService {
         transactionRepository.delete(transaction);
     }
 
-    public TransactionDto getTransaction(Long transactionId) {
-        return null;
+    public TransactionDto getTransactionById(Long transactionId) {
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new AppException("Transaction not found", HttpStatus.NOT_FOUND));
+        return transactionMapper.toTransactionDto(transaction);
     }
 
     public Page<TransactionDto> getAllTransactions(Pageable pageable) {

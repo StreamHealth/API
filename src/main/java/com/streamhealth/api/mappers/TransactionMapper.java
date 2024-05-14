@@ -12,6 +12,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface TransactionMapper {
+    @Mapping(target = "transactionId", source = "transactionId")
     TransactionDto toTransactionDto(Transaction transaction);
     Transaction toTransaction(TransactionDto transactionDto);
     List<TransactionDto> toTransactionDtos(List<Transaction> transactions);
