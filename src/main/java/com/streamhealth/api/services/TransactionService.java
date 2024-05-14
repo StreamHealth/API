@@ -160,4 +160,43 @@ public class TransactionService {
             return dateSpec;
         }
     }
+
+    public TransactionDto updateTransaction(Long transactionId, TransactionDto updatedTransactionDto, User cashier) {
+        Transaction existingTransaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new AppException("Transaction not found", HttpStatus.NOT_FOUND));
+
+        transactionMapper.updateTransactionFromDto(updatedTransactionDto, existingTransaction);
+        existingTransaction.setCashier(cashier);
+        existingTransaction.setTransactionDate(java.sql.Timestamp.valueOf(LocalDateTime.now()));
+
+        List<TransactionProduct> transactionProducts = transactionProductRepository.findAllByTransaction(existingTransaction);
+        transactionProductRepository.deleteAll(transactionProducts);
+
+        existingTransaction.getProducts().clear();
+        for (TransactionDto.ProductSaleDto productSaleDto : updatedTransactionDto.getProducts()) {
+            Product product = productRepository.findById(productSaleDto.getProductId())
+                    .orElseThrow(() -> new AppException("Product not found", HttpStatus.NOT_FOUND));
+
+            int updatedStock = product.getProductStock() - productSaleDto.getQuantitySold();
+            if (updatedStock < 0) {
+                throw new AppException("Insufficient stock for product: " + product.getProductName(), HttpStatus.BAD_REQUEST);
+            }
+            TransactionProduct transactionProduct = new TransactionProduct();
+            transactionProduct.setTransaction(existingTransaction);
+            transactionProduct.setProduct(product);
+            transactionProduct.setQuantitySold(productSaleDto.getQuantitySold());
+
+            TransactionProduct savedTransactionProduct = transactionProductRepository.save(transactionProduct);
+            existingTransaction.getProducts().add(savedTransactionProduct);
+        }
+
+        Transaction updatedTransaction = transactionRepository.save(existingTransaction);
+
+        transactionRepository.flush();
+
+        Transaction latestTransaction = transactionRepository.findById(updatedTransaction.getTransactionId())
+                .orElseThrow(() -> new AppException("Transaction not found", HttpStatus.NOT_FOUND));
+
+        return transactionMapper.toTransactionDto(latestTransaction);
+    }
 }

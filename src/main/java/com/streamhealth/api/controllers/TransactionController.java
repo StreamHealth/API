@@ -72,4 +72,17 @@ public class TransactionController {
         transactionService.deleteTransaction(transactionId);
         return ResponseEntity.ok("Transaction deleted successfully");
     }
+
+    @PutMapping("/update_transaction/{transactionId}")
+    public ResponseEntity<?> updateTransaction(@PathVariable Long transactionId,
+                                               @RequestBody TransactionDto updateTransactionDto,
+                                               HttpServletRequest request) {
+
+        String login = JWTUtil.extractLoginFromToken(request);
+        User cashier = userRepository.findByLogin(login)
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
+        transactionService.validateTransactionDto(updateTransactionDto);
+        TransactionDto updatedTransactionData = transactionService.updateTransaction(transactionId, updateTransactionDto, cashier);
+        return ResponseEntity.ok(updatedTransactionData);
+    }
 }

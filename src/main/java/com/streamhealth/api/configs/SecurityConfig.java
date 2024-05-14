@@ -43,6 +43,7 @@ public class SecurityConfig {
         );
 
         Set<String> putEndpoints = Set.of(
+                "/api/v1/transaction/update_transaction/{transactionId}",
                 "/api/v1/product/update_product/{productId}"
         );
 
