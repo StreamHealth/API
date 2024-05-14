@@ -152,29 +152,19 @@ public class TransactionService {
 
     public Page<TransactionDto> getAllTransactions(Long transactionId, String transactionDate, Pageable pageable) {
         Specification<Transaction> spec = Specification.where(null);
-        if (transactionId != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("transactionId"), transactionId));
-        }
-        LocalDateTime startOfDay;
-        LocalDateTime endOfDay;
-        if (transactionDate != null && !transactionDate.isEmpty()) {
-            LocalDate date = LocalDate.parse(transactionDate);
-            startOfDay = date.atStartOfDay();
-            endOfDay = date.plusDays(1).atStartOfDay();
-        } else {
-            startOfDay = LocalDate.now().atStartOfDay();
-            endOfDay = LocalDate.now().plusDays(1).atStartOfDay();
-        }
-        spec = spec.and((root, query, cb) -> cb.between(root.get("transactionDate"), startOfDay, endOfDay));
+        spec = spec.and(getDateRangeAndIdSpec(transactionId, transactionDate));
         Page<Transaction> transactions = transactionRepository.findAll(spec, pageable);
         return transactions.map(transactionMapper::toTransactionDto);
     }
 
     public Page<TransactionDto> getAllTransactionsByCashierId(Long cashierId, Long transactionId, String transactionDate, Pageable pageable) {
         Specification<Transaction> spec = Specification.where((root, query, cb) -> cb.equal(root.get("cashier").get("id"), cashierId));
-        if (transactionId != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("transactionId"), transactionId));
-        }
+        spec = spec.and(getDateRangeAndIdSpec(transactionId, transactionDate));
+        Page<Transaction> transactions = transactionRepository.findAll(spec, pageable);
+        return transactions.map(transactionMapper::toTransactionDto);
+    }
+
+    private Specification<Transaction> getDateRangeAndIdSpec(Long transactionId, String transactionDate) {
         LocalDateTime startOfDay;
         LocalDateTime endOfDay;
         if (transactionDate != null && !transactionDate.isEmpty()) {
@@ -185,8 +175,12 @@ public class TransactionService {
             startOfDay = LocalDate.now().atStartOfDay();
             endOfDay = LocalDate.now().plusDays(1).atStartOfDay();
         }
-        spec = spec.and((root, query, cb) -> cb.between(root.get("transactionDate"), startOfDay, endOfDay));
-        Page<Transaction> transactions = transactionRepository.findAll(spec, pageable);
-        return transactions.map(transactionMapper::toTransactionDto);
+        Specification<Transaction> dateSpec = (root, query, cb) -> cb.between(root.get("transactionDate"), startOfDay, endOfDay);
+        if (transactionId != null) {
+            Specification<Transaction> idSpec = (root, query, cb) -> cb.equal(root.get("transactionId"), transactionId);
+            return dateSpec.and(idSpec);
+        } else {
+            return dateSpec;
+        }
     }
 }
