@@ -24,18 +24,21 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         Set<String> getEndpoints = Set.of(
+                "/api/v1/transaction/get_transaction/{transactionId}",
                 "/api/v1/product/get_products",
                 "/api/v1/product/get_product/{productId}",
                 "/api/v1"
         );
 
         Set<String> postEndpoints = Set.of(
+                "/api/v1/transaction/add_transaction",
                 "/api/v1/product/add_product",
                 "/api/v1/auth/register",
                 "/api/v1/auth/login"
         );
 
         Set<String> deleteEndpoints = Set.of(
+                "/api/v1/transaction/delete_transaction/{transactionId}",
                 "/api/v1/product/delete_product/{productId}"
         );
 

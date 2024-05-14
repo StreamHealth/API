@@ -13,16 +13,13 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "transaction_product")
 public class TransactionProduct {
-    @EmbeddedId
-    private TransactionProductId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long transactionProductId;
+    private Long productId;
+    private int quantitySold;
 
     @ManyToOne
-    @MapsId("transactionId")
+    @JoinColumn(name = "transaction_id")
     private Transaction transaction;
-
-    @ManyToOne
-    @JoinColumn(name = "productId", referencedColumnName = "productId", insertable = false, updatable = false)
-    private Product product;
-
-    private int quantity;
 }

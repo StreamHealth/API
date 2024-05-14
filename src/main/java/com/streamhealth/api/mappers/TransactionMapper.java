@@ -1,0 +1,32 @@
+package com.streamhealth.api.mappers;
+
+import com.streamhealth.api.dtos.TransactionDto;
+import com.streamhealth.api.entities.Transaction;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.springframework.data.domain.Page;
+
+import java.util.List;
+
+@Mapper(componentModel = "spring")
+public interface TransactionMapper {
+    TransactionDto toTransactionDto(Transaction transaction);
+    Transaction toTransaction(TransactionDto transactionDto);
+    List<TransactionDto> toTransactionDtos(List<Transaction> transactions);
+
+    @Mapping(target = "clientName", source = "transactionDto.clientName")
+    @Mapping(target = "transactionDate", source = "transactionDto.transactionDate")
+    @Mapping(target = "cashier", source = "transactionDto.cashier")
+    @Mapping(target = "totalAmount", source = "transactionDto.totalAmount")
+    @Mapping(target = "paymentMethod", source = "transactionDto.paymentMethod")
+    @Mapping(target = "discountType", source = "transactionDto.discountType")
+    @Mapping(target = "discountPercentage", source = "transactionDto.discountPercentage")
+    @Mapping(target = "products", source = "transactionDto.products")
+    @Mapping(target = "transactionId", ignore = true)
+    void updateTransactionFromDto(TransactionDto transactionDto, @MappingTarget Transaction transaction);
+
+    default Page<TransactionDto> toTransactionDtos(Page<Transaction> transactions) {
+        return transactions.map(this::toTransactionDto);
+    }
+}

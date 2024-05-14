@@ -21,22 +21,17 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transactionId;
+    private String clientName;
+    private Date transactionDate;
+    private String discountType;
+    private Double discountPercentage;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "cashier_id")
+    private User cashier;
+    private BigDecimal totalAmount;
+    private String paymentMethod;
 
-    private String clientName;
-    private BigDecimal amount;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date transactionDate;
-
-    @OneToMany(mappedBy= "transaction")
-    private Set<TransactionProduct> transactionProducts = new HashSet<>();
-
-    private String discountType;
-    @Column(precision = 15, scale = 2)
-    private BigDecimal discountAmount;
-
+    @OneToMany(mappedBy = "transaction")
+    private Set<TransactionProduct> products = new HashSet<>();
 }

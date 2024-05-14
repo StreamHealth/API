@@ -43,6 +43,7 @@ public class UserAuthProvider {
                 .withIssuedAt(now)
                 .withExpiresAt(validity)
                 .withClaim("name", dto.getName())
+                .withClaim("userId", dto.getId())
                 .sign(Algorithm.HMAC256(secretKey));
     }
 
@@ -57,6 +58,7 @@ public class UserAuthProvider {
         UserDto user = UserDto.builder()
                 .login(decodedJWT.getIssuer())
                 .name(decodedJWT.getClaim("name").asString())
+                .id(decodedJWT.getClaim("userId").asLong())
                 .build();
         return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
     }
