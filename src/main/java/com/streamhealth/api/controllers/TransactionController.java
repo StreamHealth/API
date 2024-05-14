@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,18 +32,19 @@ public class TransactionController {
 
     @GetMapping("/get_transactions")
     public ResponseEntity<Page<TransactionDto>> getAllTransactions(@RequestParam(required = false) Boolean filterByCashier,
+                                                                   @RequestParam(required = false) String transactionDate,
+                                                                   @RequestParam(required = false) Long transactionId,
                                                                    @PageableDefault(size = 5) Pageable pageable,
                                                                    HttpServletRequest request) {
-
         Page<TransactionDto> transactionsData;
         if (Boolean.TRUE.equals(filterByCashier)) {
             String login = JWTUtil.extractLoginFromToken(request);
             User cashier = userRepository.findByLogin(login)
                     .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
             Long cashierId = cashier.getId();
-            transactionsData = transactionService.getAllTransactionsByCashierId(cashierId, pageable);
+            transactionsData = transactionService.getAllTransactionsByCashierId(cashierId, transactionId, transactionDate, pageable);
         } else {
-            transactionsData = transactionService.getAllTransactions(pageable);
+            transactionsData = transactionService.getAllTransactions(transactionId, transactionDate, pageable);
         }
         return ResponseEntity.ok(transactionsData);
     }

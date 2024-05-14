@@ -20,11 +20,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,14 +83,6 @@ public class TransactionService {
         }
     }
 
-    private User getCashier() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentLogin = ((UserDto) authentication.getPrincipal()).getLogin();
-
-        return userRepository.findByLogin(currentLogin)
-                .orElseThrow(()-> new AppException("Unknown user", HttpStatus.NOT_FOUND));
-    }
-
     public TransactionDto addTransaction(TransactionDto transactionDto, User cashier) {
 
         Transaction transaction = transactionMapper.toTransaction(transactionDto);
@@ -124,13 +118,75 @@ public class TransactionService {
         return transactionMapper.toTransactionDto(transaction);
     }
 
-    public Page<TransactionDto> getAllTransactions(Pageable pageable) {
-        Page<Transaction> transactions = transactionRepository.findAll(pageable);
+//    public Page<TransactionDto> getAllTransactions(Long transactionId, String transactionDate, Pageable pageable) {
+//        Specification<Transaction> spec = Specification.where(null);
+//        if (transactionId != null) {
+//            spec = spec.and((root, query, cb) -> cb.equal(root.get("transactionId"), transactionId));
+//        }
+//        LocalDate date;
+//        if (transactionDate != null && !transactionDate.isEmpty()) {
+//            date = LocalDate.parse(transactionDate);
+//        } else {
+//            date = LocalDate.now();
+//        }
+//        spec = spec.and((root, query, cb) -> cb.equal(cb.function("DATE", LocalDate.class, root.get("transactionDate")), date));
+//        Page<Transaction> transactions = transactionRepository.findAll(spec, pageable);
+//        return transactions.map(transactionMapper::toTransactionDto);
+//    }
+//
+//    public Page<TransactionDto> getAllTransactionsByCashierId(Long cashierId, Long transactionId, String transactionDate, Pageable pageable) {
+//        Specification<Transaction> spec = Specification.where((root, query, cb) -> cb.equal(root.get("cashier").get("id"), cashierId));
+//        if (transactionId != null) {
+//            spec = spec.and((root, query, cb) -> cb.equal(root.get("transactionId"), transactionId));
+//        }
+//        LocalDate date;
+//        if (transactionDate != null && !transactionDate.isEmpty()) {
+//            date = LocalDate.parse(transactionDate);
+//        } else {
+//            date = LocalDate.now();
+//        }
+//        spec = spec.and((root, query, cb) -> cb.equal(cb.function("DATE", LocalDate.class, root.get("transactionDate")), date));
+//        Page<Transaction> transactions = transactionRepository.findAll(spec, pageable);
+//        return transactions.map(transactionMapper::toTransactionDto);
+//    }
+
+    public Page<TransactionDto> getAllTransactions(Long transactionId, String transactionDate, Pageable pageable) {
+        Specification<Transaction> spec = Specification.where(null);
+        if (transactionId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("transactionId"), transactionId));
+        }
+        LocalDateTime startOfDay;
+        LocalDateTime endOfDay;
+        if (transactionDate != null && !transactionDate.isEmpty()) {
+            LocalDate date = LocalDate.parse(transactionDate);
+            startOfDay = date.atStartOfDay();
+            endOfDay = date.plusDays(1).atStartOfDay();
+        } else {
+            startOfDay = LocalDate.now().atStartOfDay();
+            endOfDay = LocalDate.now().plusDays(1).atStartOfDay();
+        }
+        spec = spec.and((root, query, cb) -> cb.between(root.get("transactionDate"), startOfDay, endOfDay));
+        Page<Transaction> transactions = transactionRepository.findAll(spec, pageable);
         return transactions.map(transactionMapper::toTransactionDto);
     }
 
-    public Page<TransactionDto> getAllTransactionsByCashierId(Long cashierId, Pageable pageable) {
-        Page<Transaction> transactions = transactionRepository.findByCashierId(cashierId, pageable);
+    public Page<TransactionDto> getAllTransactionsByCashierId(Long cashierId, Long transactionId, String transactionDate, Pageable pageable) {
+        Specification<Transaction> spec = Specification.where((root, query, cb) -> cb.equal(root.get("cashier").get("id"), cashierId));
+        if (transactionId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("transactionId"), transactionId));
+        }
+        LocalDateTime startOfDay;
+        LocalDateTime endOfDay;
+        if (transactionDate != null && !transactionDate.isEmpty()) {
+            LocalDate date = LocalDate.parse(transactionDate);
+            startOfDay = date.atStartOfDay();
+            endOfDay = date.plusDays(1).atStartOfDay();
+        } else {
+            startOfDay = LocalDate.now().atStartOfDay();
+            endOfDay = LocalDate.now().plusDays(1).atStartOfDay();
+        }
+        spec = spec.and((root, query, cb) -> cb.between(root.get("transactionDate"), startOfDay, endOfDay));
+        Page<Transaction> transactions = transactionRepository.findAll(spec, pageable);
         return transactions.map(transactionMapper::toTransactionDto);
     }
 }
