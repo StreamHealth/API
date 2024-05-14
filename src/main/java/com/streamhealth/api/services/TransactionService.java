@@ -15,8 +15,11 @@ import com.streamhealth.api.repositories.ProductRepository;
 import com.streamhealth.api.repositories.TransactionProductRepository;
 import com.streamhealth.api.repositories.TransactionRepository;
 import com.streamhealth.api.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -78,19 +81,19 @@ public class TransactionService {
         }
     }
 
-    public TransactionDto addTransaction(TransactionDto transactionDto) {
+    private User getCashier() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentLogin = ((UserDto) authentication.getPrincipal()).getLogin();
 
-        User user = userRepository.findByLogin(currentLogin)
-                        .orElseThrow(()-> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+        return userRepository.findByLogin(currentLogin)
+                .orElseThrow(()-> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+    }
 
-        validateTransactionDto(transactionDto);
+    public TransactionDto addTransaction(TransactionDto transactionDto, User cashier) {
 
         Transaction transaction = transactionMapper.toTransaction(transactionDto);
         transaction.setTransactionDate(java.sql.Timestamp.valueOf(LocalDateTime.now()));
-        transaction.setCashier(user);
-
+        transaction.setCashier(cashier);
         Transaction savedTransaction = transactionRepository.save(transaction);
 
         for (TransactionDto.ProductSaleDto productSaleDto : transactionDto.getProducts()) {
@@ -108,12 +111,24 @@ public class TransactionService {
         return transactionMapper.toTransactionDto(savedTransaction);
     }
 
+    @Transactional
     public void deleteTransaction(Long transactionId) {
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new AppException("Transaction not found", HttpStatus.NOT_FOUND));
+        transactionRepository.delete(transaction);
     }
 
     public TransactionDto getTransaction(Long transactionId) {
         return null;
     }
 
+    public Page<TransactionDto> getAllTransactions(Pageable pageable) {
+        Page<Transaction> transactions = transactionRepository.findAll(pageable);
+        return transactions.map(transactionMapper::toTransactionDto);
+    }
 
+    public Page<TransactionDto> getAllTransactionsByCashierId(Long cashierId, Pageable pageable) {
+        Page<Transaction> transactions = transactionRepository.findByCashierId(cashierId, pageable);
+        return transactions.map(transactionMapper::toTransactionDto);
+    }
 }

@@ -16,7 +16,6 @@ public class TransactionDto {
 
     private String clientName;
     private Date transactionDate;
-    private Long cashierId;
     private BigDecimal totalAmount;
     private String paymentMethod;
     private String discountType;

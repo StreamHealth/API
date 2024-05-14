@@ -24,6 +24,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         Set<String> getEndpoints = Set.of(
+                "/api/v1/transaction/get_transactions",
                 "/api/v1/transaction/get_transaction/{transactionId}",
                 "/api/v1/product/get_products",
                 "/api/v1/product/get_product/{productId}",

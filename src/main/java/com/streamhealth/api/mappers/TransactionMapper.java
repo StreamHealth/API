@@ -15,6 +15,7 @@ public interface TransactionMapper {
     TransactionDto toTransactionDto(Transaction transaction);
     Transaction toTransaction(TransactionDto transactionDto);
     List<TransactionDto> toTransactionDtos(List<Transaction> transactions);
+    List<TransactionProduct> toTransactionProducts(List<TransactionDto.ProductSaleDto> productSaleDtos);
 
     @Mapping(target = "clientName", source = "transactionDto.clientName")
     @Mapping(target = "transactionDate", source = "transactionDto.transactionDate")
@@ -30,7 +31,7 @@ public interface TransactionMapper {
     default Page<TransactionDto> toTransactionDtos(Page<Transaction> transactions) {
         return transactions.map(this::toTransactionDto);
     }
-    List<TransactionProduct> toTransactionProducts(List<TransactionDto.ProductSaleDto> productSaleDtos);
+
 
 }
 

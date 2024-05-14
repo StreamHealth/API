@@ -32,6 +32,6 @@ public class Transaction {
     private BigDecimal totalAmount;
     private String paymentMethod;
 
-    @OneToMany(mappedBy = "transaction")
+    @OneToMany(mappedBy = "transaction",  cascade = CascadeType.REMOVE)
     private List<TransactionProduct> products = new ArrayList<>();
 }
