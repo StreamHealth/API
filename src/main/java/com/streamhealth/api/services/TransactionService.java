@@ -1,13 +1,21 @@
 package com.streamhealth.api.services;
 
 import com.streamhealth.api.dtos.TransactionDto;
+import com.streamhealth.api.dtos.UserDataDto;
 import com.streamhealth.api.dtos.UserDto;
+import com.streamhealth.api.entities.Product;
 import com.streamhealth.api.entities.Transaction;
+import com.streamhealth.api.entities.TransactionProduct;
 import com.streamhealth.api.entities.User;
 import com.streamhealth.api.exceptions.AppException;
 import com.streamhealth.api.mappers.TransactionMapper;
+import com.streamhealth.api.mappers.TransactionProductMapper;
+import com.streamhealth.api.mappers.UserMapper;
+import com.streamhealth.api.repositories.ProductRepository;
+import com.streamhealth.api.repositories.TransactionProductRepository;
 import com.streamhealth.api.repositories.TransactionRepository;
 import com.streamhealth.api.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -17,19 +25,26 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class TransactionService {
-
     @Autowired
     TransactionRepository transactionRepository;
 
     @Autowired
     TransactionMapper transactionMapper;
-
     @Autowired
-    UserRepository userRepository;
+    private UserService userService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    ProductRepository productRepository;
+    @Autowired
+    private TransactionProductRepository transactionProductRepository;
+    @Autowired
+    TransactionProductMapper transactionProductMapper;
+
 
     public void validateTransactionDto(TransactionDto transactionDto) {
         List<String> missingFields = new ArrayList<>();
@@ -63,17 +78,12 @@ public class TransactionService {
         }
     }
 
-
     public TransactionDto addTransaction(TransactionDto transactionDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDto currentUser = (UserDto) authentication.getPrincipal();
-        String currentLogin = currentUser.getLogin();
+        String currentLogin = ((UserDto) authentication.getPrincipal()).getLogin();
 
-        Optional<User> userOptional = userRepository.findByLogin(currentLogin);
-        if (userOptional.isEmpty()) {
-            throw new AppException("Unknown user", HttpStatus.NOT_FOUND);
-        }
-        User user = userOptional.get();
+        User user = userRepository.findByLogin(currentLogin)
+                        .orElseThrow(()-> new AppException("Unknown user", HttpStatus.NOT_FOUND));
 
         validateTransactionDto(transactionDto);
 
@@ -83,11 +93,22 @@ public class TransactionService {
 
         Transaction savedTransaction = transactionRepository.save(transaction);
 
+        for (TransactionDto.ProductSaleDto productSaleDto : transactionDto.getProducts()) {
+            Product product = productRepository.findById(productSaleDto.getProductId())
+                    .orElseThrow(() -> new AppException("Product not found", HttpStatus.NOT_FOUND));
+
+            TransactionProduct transactionProduct = transactionProductMapper.toTransactionProduct(productSaleDto);
+            transactionProduct.setTransaction(savedTransaction);
+            transactionProduct.setProduct(product);
+
+            TransactionProduct savedTransactionProduct = transactionProductRepository.save(transactionProduct);
+            System.out.println("\n\nSavedTransactionProduct: " + savedTransactionProduct);
+        }
+
         return transactionMapper.toTransactionDto(savedTransaction);
     }
 
     public void deleteTransaction(Long transactionId) {
-        return;
     }
 
     public TransactionDto getTransaction(Long transactionId) {

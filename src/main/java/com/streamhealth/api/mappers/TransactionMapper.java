@@ -2,6 +2,7 @@ package com.streamhealth.api.mappers;
 
 import com.streamhealth.api.dtos.TransactionDto;
 import com.streamhealth.api.entities.Transaction;
+import com.streamhealth.api.entities.TransactionProduct;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -29,4 +30,8 @@ public interface TransactionMapper {
     default Page<TransactionDto> toTransactionDtos(Page<Transaction> transactions) {
         return transactions.map(this::toTransactionDto);
     }
+    List<TransactionProduct> toTransactionProducts(List<TransactionDto.ProductSaleDto> productSaleDtos);
+
 }
+
+

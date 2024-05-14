@@ -16,7 +16,11 @@ public class TransactionProduct {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transactionProductId;
-    private Long productId;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "product_id")
+    private Product product;
+
     private int quantitySold;
 
     @ManyToOne

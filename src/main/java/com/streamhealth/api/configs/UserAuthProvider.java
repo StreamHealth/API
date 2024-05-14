@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.streamhealth.api.dtos.UserDto;
+import com.streamhealth.api.entities.User;
 import com.streamhealth.api.exceptions.AppException;
 import com.streamhealth.api.mappers.UserMapper;
 import com.streamhealth.api.repositories.UserRepository;
@@ -44,6 +45,7 @@ public class UserAuthProvider {
                 .withExpiresAt(validity)
                 .withClaim("name", dto.getName())
                 .withClaim("userId", dto.getId())
+                .withClaim("login", dto.getLogin())
                 .sign(Algorithm.HMAC256(secretKey));
     }
 
@@ -69,9 +71,11 @@ public class UserAuthProvider {
         JWT.require(algorithm).build();
         DecodedJWT decodedJWT = JWT.decode(token);
 
-        userRepository.findByLogin(decodedJWT.getIssuer())
+        User user = userRepository.findByLogin(decodedJWT.getIssuer())
                 .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
-        return new UsernamePasswordAuthenticationToken(userM, null, Collections.emptyList());
+        UserDto userDto = userM.toUserDto(user);
+
+        return new UsernamePasswordAuthenticationToken(userDto, null, Collections.emptyList());
     }
 }

@@ -4,12 +4,12 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import java.util.Date;
+
+import java.util.*;
+
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,5 +33,5 @@ public class Transaction {
     private String paymentMethod;
 
     @OneToMany(mappedBy = "transaction")
-    private Set<TransactionProduct> products = new HashSet<>();
+    private List<TransactionProduct> products = new ArrayList<>();
 }
