@@ -87,6 +87,13 @@ public class TransactionService {
             Product product = productRepository.findById(productSaleDto.getProductId())
                     .orElseThrow(() -> new AppException("Product not found", HttpStatus.NOT_FOUND));
 
+            int updatedStock = product.getProductStock() - productSaleDto.getQuantitySold();
+            if (updatedStock < 0) {
+                throw new AppException("Insufficient stock for product: " + product.getProductName(), HttpStatus.BAD_REQUEST);
+            }
+            product.setProductStock(updatedStock);
+            productRepository.save(product);
+
             TransactionProduct transactionProduct = new TransactionProduct();
             transactionProduct.setTransaction(savedTransaction);
             transactionProduct.setProduct(product);
