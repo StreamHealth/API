@@ -11,7 +11,6 @@ import com.streamhealth.api.mappers.TransactionProductMapper;
 import com.streamhealth.api.repositories.ProductRepository;
 import com.streamhealth.api.repositories.TransactionProductRepository;
 import com.streamhealth.api.repositories.TransactionRepository;
-import com.streamhealth.api.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

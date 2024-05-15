@@ -1,11 +1,6 @@
 package com.streamhealth.api.controllers;
 
-
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.streamhealth.api.dtos.ProductDto;
 import com.streamhealth.api.dtos.TransactionDto;
-import com.streamhealth.api.entities.Transaction;
 import com.streamhealth.api.entities.User;
 import com.streamhealth.api.exceptions.AppException;
 import com.streamhealth.api.repositories.UserRepository;
@@ -16,12 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
