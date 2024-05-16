@@ -13,8 +13,6 @@ import com.streamhealth.api.repositories.TransactionProductRepository;
 import com.streamhealth.api.repositories.TransactionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,7 +39,6 @@ public class TransactionService {
     @Autowired
     TransactionProductMapper transactionProductMapper;
 
-    private static final Logger logger = LoggerFactory.getLogger(TransactionService.class);
     public void validateTransactionDto(TransactionDto transactionDto) {
         List<String> missingFields = new ArrayList<>();
 
@@ -141,22 +138,22 @@ public class TransactionService {
     }
 
     private Specification<Transaction> getDateRangeAndIdSpec(Long transactionId, String transactionDate) {
-        LocalDateTime startOfDay;
-        LocalDateTime endOfDay;
         if (transactionDate != null && !transactionDate.isEmpty()) {
             LocalDate date = LocalDate.parse(transactionDate);
-            startOfDay = date.atStartOfDay();
-            endOfDay = date.plusDays(1).atStartOfDay();
+            LocalDateTime startOfDay = date.atStartOfDay();
+            LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
+            Specification<Transaction> dateSpec = (root, query, cb) -> cb.between(root.get("transactionDate"), startOfDay, endOfDay);
+            if (transactionId != null) {
+                return dateSpec.and((root, query, cb) -> cb.equal(root.get("transactionId"), transactionId));
+            } else {
+                return dateSpec;
+            }
         } else {
-            startOfDay = LocalDate.now().atStartOfDay();
-            endOfDay = LocalDate.now().plusDays(1).atStartOfDay();
-        }
-        Specification<Transaction> dateSpec = (root, query, cb) -> cb.between(root.get("transactionDate"), startOfDay, endOfDay);
-        if (transactionId != null) {
-            Specification<Transaction> idSpec = (root, query, cb) -> cb.equal(root.get("transactionId"), transactionId);
-            return dateSpec.and(idSpec);
-        } else {
-            return dateSpec;
+            if (transactionId != null) {
+                return (root, query, cb) -> cb.equal(root.get("transactionId"), transactionId);
+            } else {
+                return Specification.where(null); // No filtering applied, all transactions are returned
+            }
         }
     }
 
